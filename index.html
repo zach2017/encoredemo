@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Interactive Map with Layered Tags</title>
+    <title>Montgomery, AL Map with Sports and Music Tags</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v7.3.0/ol.css">
     <style>
         #map {
@@ -25,22 +25,22 @@
     <div id="controls">
         <input type="text" id="tagName" placeholder="Enter tag name then click on map">
         <select id="layerSelect">
-            <option value="layer1">Layer 1</option>
-            <option value="layer2">Layer 2</option>
+            <option value="sports">Sports</option>
+            <option value="music">Music</option>
         </select>
         <button onclick="clearTags()">Clear All Tags</button>
         <span id="status"></span>
     </div>
     <div id="layerControls">
-        <label><input type="checkbox" id="layer1Check" checked> Layer 1</label>
-        <label><input type="checkbox" id="layer2Check" checked> Layer 2</label>
+        <label><input type="checkbox" id="sportsCheck" checked> Sports</label>
+        <label><input type="checkbox" id="musicCheck" checked> Music</label>
         <label><input type="checkbox" id="showAllCheck" checked> Show All</label>
     </div>
     <div id="map"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
     <script>
-        // Initialize the map
+        // Initialize the map centered on Montgomery, AL
         const map = new ol.Map({
             target: 'map',
             layers: [
@@ -49,20 +49,20 @@
                 })
             ],
             view: new ol.View({
-                center: ol.proj.fromLonLat([0, 0]),
-                zoom: 2
+                center: ol.proj.fromLonLat([-86.2990, 32.3668]), // Montgomery, AL coordinates
+                zoom: 12 // Zoomed in to city level
             })
         });
 
         // Create vector layers for tags
         const vectorSources = {
-            layer1: new ol.source.Vector(),
-            layer2: new ol.source.Vector()
+            sports: new ol.source.Vector(),
+            music: new ol.source.Vector()
         };
 
         const vectorLayers = {
-            layer1: new ol.layer.Vector({
-                source: vectorSources.layer1,
+            sports: new ol.layer.Vector({
+                source: vectorSources.sports,
                 style: new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: 6,
@@ -71,8 +71,8 @@
                     })
                 })
             }),
-            layer2: new ol.layer.Vector({
-                source: vectorSources.layer2,
+            music: new ol.layer.Vector({
+                source: vectorSources.music,
                 style: new ol.style.Style({
                     image: new ol.style.Circle({
                         radius: 6,
@@ -83,13 +83,13 @@
             })
         };
 
-        map.addLayer(vectorLayers.layer1);
-        map.addLayer(vectorLayers.layer2);
+        map.addLayer(vectorLayers.sports);
+        map.addLayer(vectorLayers.music);
 
         // Store overlays for each layer
         const layerOverlays = {
-            layer1: [],
-            layer2: []
+            sports: [],
+            music: []
         };
 
         // Load existing tags from localStorage
@@ -154,32 +154,32 @@
         }
 
         // Handle layer visibility
-        const layer1Check = document.getElementById('layer1Check');
-        const layer2Check = document.getElementById('layer2Check');
+        const sportsCheck = document.getElementById('sportsCheck');
+        const musicCheck = document.getElementById('musicCheck');
         const showAllCheck = document.getElementById('showAllCheck');
 
-        layer1Check.addEventListener('change', updateLayerVisibility);
-        layer2Check.addEventListener('change', updateLayerVisibility);
+        sportsCheck.addEventListener('change', updateLayerVisibility);
+        musicCheck.addEventListener('change', updateLayerVisibility);
         showAllCheck.addEventListener('change', function() {
             if (this.checked) {
-                layer1Check.checked = true;
-                layer2Check.checked = true;
+                sportsCheck.checked = true;
+                musicCheck.checked = true;
             }
             updateLayerVisibility();
         });
 
         function updateLayerVisibility() {
-            vectorLayers.layer1.setVisible(layer1Check.checked);
-            vectorLayers.layer2.setVisible(layer2Check.checked);
+            vectorLayers.sports.setVisible(sportsCheck.checked);
+            vectorLayers.music.setVisible(musicCheck.checked);
             
-            layerOverlays.layer1.forEach(overlay => {
-                overlay.getElement().style.display = layer1Check.checked ? 'block' : 'none';
+            layerOverlays.sports.forEach(overlay => {
+                overlay.getElement().style.display = sportsCheck.checked ? 'block' : 'none';
             });
-            layerOverlays.layer2.forEach(overlay => {
-                overlay.getElement().style.display = layer2Check.checked ? 'block' : 'none';
+            layerOverlays.music.forEach(overlay => {
+                overlay.getElement().style.display = musicCheck.checked ? 'block' : 'none';
             });
             
-            showAllCheck.checked = layer1Check.checked && layer2Check.checked;
+            showAllCheck.checked = sportsCheck.checked && musicCheck.checked;
         }
 
         // Handle map clicks to add tags
@@ -214,7 +214,7 @@
                 statusSpan.textContent = 'Tag added! Enter new tag name to add another';
                 setTimeout(() => statusSpan.textContent = '', 2000);
                 map.getTargetElement().style.cursor = 'default';
-                updateLayerVisibility(); // Ensure new tag respects current visibility
+                updateLayerVisibility();
             }
         });
 
@@ -258,7 +258,7 @@
 
         // Load tags when page loads
         loadTags();
-        updateLayerVisibility(); // Ensure initial visibility is correct
+        updateLayerVisibility();
 
         // Additional CSS for tooltips
         const style = document.createElement('style');
