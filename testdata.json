@@ -1,0 +1,26 @@
+{
+  "sports": [
+      {
+          "name": "Riverwalk Stadium",
+          "lon": -86.3078,
+          "lat": 32.3802
+      },
+      {
+          "name": "Cramton Bowl",
+          "lon": -86.2988,
+          "lat": 32.3835
+      }
+  ],
+  "music": [
+      {
+          "name": "Capitol Sounds",
+          "lon": -86.3021,
+          "lat": 32.3773
+      },
+      {
+          "name": "Montgomery Performing Arts Centre",
+          "lon": -86.3080,
+          "lat": 32.3748
+      }
+  ]
+}

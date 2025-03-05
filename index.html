@@ -20,8 +20,59 @@
             margin-top: 10px;
         }
     </style>
+<!-- Replace the previous test data script with this new version -->
+<script>
+    // Function to fetch JSON from URL and initialize mapTags
+    async function fetchInitialData(url) {
+        try {
+            // Check if data already exists in localStorage
+            if (!localStorage.getItem('mapTags')) {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const jsonData = await response.json();
+                localStorage.setItem('mapTags', JSON.stringify(jsonData));
+                console.log('Data loaded from URL:', jsonData);
+            }
+            // Load tags after fetching or if data already exists
+            loadTags();
+        } catch (error) {
+            console.error('Error fetching initial data:', error);
+            // Fallback to empty object if fetch fails
+            if (!localStorage.getItem('mapTags')) {
+                localStorage.setItem('mapTags', JSON.stringify({}));
+            }
+            loadTags();
+        }
+    }
+
+    // Modify the loadTags function
+    function loadTags() {
+        const tags = JSON.parse(localStorage.getItem('mapTags') || '{}');
+        for (const layer in tags) {
+            if (vectorSources[layer]) {
+                tags[layer].forEach(tag => addTagToMap(tag.name, tag.lon, tag.lat, layer));
+            }
+        }
+    }
+
+    // Call this when the page loads with your URL
+    // Replace with your actual JSON URL
+    function getUrlParameter(parameterName) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(parameterName);
+     }
+
+// Example usage:
+    const dataUrl = getUrlParameter('apiUrl');
+
+   // const dataUrl = 'http://localhost:4000/testdata.json';
+    fetchInitialData(dataUrl);
+</script>
 </head>
 <body>
+  
     <div id="controls">
         <input type="text" id="tagName" placeholder="Enter tag name then click on map">
         <select id="layerSelect">
@@ -93,14 +144,22 @@
         };
 
         // Load existing tags from localStorage
-        function loadTags() {
-            const tags = JSON.parse(localStorage.getItem('mapTags') || '{}');
-            for (const layer in tags) {
-                if (vectorSources[layer]) {
-                    tags[layer].forEach(tag => addTagToMap(tag.name, tag.lon, tag.lat, layer));
-                }
-            }
+    // Replace the existing loadTags function with this
+function loadTags() {
+    let tags = JSON.parse(localStorage.getItem('mapTags'));
+    
+    // If no data in localStorage, use testData
+    if (!tags) {
+        tags = testData;
+        localStorage.setItem('mapTags', JSON.stringify(tags));
+    }
+    
+    for (const layer in tags) {
+        if (vectorSources[layer]) {
+            tags[layer].forEach(tag => addTagToMap(tag.name, tag.lon, tag.lat, layer));
         }
+    }
+}
 
         // Add tag to map
         function addTagToMap(name, lon, lat, layer) {
